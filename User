@@ -1,0 +1,36 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using MySql.Data.MySqlClient;
+
+namespace WindowsFormsApp1
+{
+    class User
+    {
+        Form1 db = new Form1();
+
+        public bool inserUser(string name, int number, string room)
+        {
+            MySqlCommand command = new MySqlCommand("INSERT INTO `name`(`name`, `contactnumber`, `room`) VALUES (@n, @num, @r)", db.getConnection);
+
+            command.Parameters.Add("@n", MySqlDbType.VarChar).Value = name;
+            command.Parameters.Add("@num", MySqlDbType.VarBinary).Value = number;
+            command.Parameters.Add("@r", MySqlDbType.VarChar).Value = room;
+
+            db.Connect();
+
+            if (command.ExecuteNonQuery() == 1)
+            {
+                db.closeConnectoin();
+                return true;
+            }
+            else
+            {
+                db.closeConnectoin();
+                return false;
+            }
+        }
+    }
+}
