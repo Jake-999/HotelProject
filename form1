@@ -1,0 +1,158 @@
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Drawing;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows.Forms;
+using System.Data.SqlClient;
+using System.IO;
+using System.ComponentModel.Design;
+using MySql.Data.MySqlClient;
+
+namespace WindowsFormsApp1
+{
+    public partial class Form1 : Form
+    {
+        User user = new User();
+
+        MySqlConnection con = new MySqlConnection("datasource=localhost;port=3306;username=root;password=;database=hoteldb;");
+        //this gives us refernce to the second from 
+        private Form2 form = new Form2();
+
+        //This is a streamwriter which allows us to write to files using them like data stores 
+        public StreamWriter file = new StreamWriter("C:\\Users\\Jake\\source\\repos\\WindowsFormsApp1\\DB.txt");
+
+        //this is a public variable so we can store the user input(name)
+        public static string NameIn;
+
+        //This allows for us to store the contact number in a local varibale.
+        public static string Number;
+
+        //this is the variable that stores our final price after all the algorthymes have been run.
+        public static int finalPrice;
+
+        // this is a variable for the num people algorithm.
+        public static int peoplePrice;
+
+        //this is a local variable to store the amount of people chosen.
+        public static int numPeople;
+
+        //this is a local variable that stores the room type.
+        public static string Room;
+
+        //this gives us refernce to our num of people combobox
+        public ComboBox ppl = new ComboBox();
+
+        public Form1()
+        {
+            InitializeComponent();
+        }
+
+        private void nameInput_TextChanged(object sender, EventArgs e)
+        {
+
+        }
+
+        private void sbtBtn_Click(object sender, EventArgs e)
+        {
+
+            if (nameInput.Text == "" || numberInput.Text == "" || amtPerson.SelectedItem == null || roomChose.SelectedItem == null)
+            {
+                MessageBox.Show("please fill in all of the requirments.");
+            }else
+            {
+                //cb.SelectedIndex = cb.SelectedIndex + 1;
+
+                //this asigns the amout of people to the varible from the combobox input
+                ppl = amtPerson;
+
+                //this allows for us to not get a negative index which would muck up the code.
+                numPeople = ppl.SelectedIndex + 1;
+
+                //this is the algorythm that determains how much the price is for the amount of people
+                peoplePrice = 30 * numPeople;
+
+                //this add the total for people to the final price.
+                finalPrice += peoplePrice;
+
+                //this stores the input form the user into a variable so it can be accsed easier.
+                NameIn = nameInput.Text;
+
+                //this stores the users contact number into a varibale.
+                Number = numberInput.Text;
+
+
+
+
+
+                //this writes to a file acting like a database.
+                file.WriteLine(NameIn + "\n" + "0" + Number + "\n" + Room + "\n" + numPeople + "\n" + "£" + finalPrice);
+
+                //this closes the file that gets writen to.
+                file.Close();
+
+                //this shows the checkout form.
+                form.Show();
+            }
+            if (user.inserUser(NameIn, int.Parse(Number), Room))
+            {
+                MessageBox.Show("You have been booked in.");
+            }else
+            {
+                MessageBox.Show("There was a problem with your booking please try again.");
+            }
+
+            
+
+
+        }
+
+        private void roomChose_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            //stores the chosen combobox value into a value.
+            int selectedValue = roomChose.SelectedIndex;
+
+            //if the value is eqaul to the first value.
+            if (selectedValue == 0)
+            {
+                //the room type is equal to standard if selectedvalue is 0
+                Room = "Standard";
+
+                //adds the room price to the final price.
+                finalPrice += 120;
+            }
+            else
+            {
+                //The room type is equal to luxury if the chosen value is not equal to 0 
+                Room = "Luxury";
+
+                //adds the price of the room to the final price.
+                finalPrice += 299;
+            }
+        }
+        public void Connect()
+        {
+            if (con.State == ConnectionState.Closed)
+            {
+                con.Open();
+            }
+        }
+        public MySqlConnection getConnection
+        {
+            get
+            {
+                return con;
+            }
+        }
+        public void closeConnectoin()
+        {
+            if (con.State == ConnectionState.Open)
+            {
+                con.Close();
+            }
+        }
+    }
+}
